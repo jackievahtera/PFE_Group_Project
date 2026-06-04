@@ -1,6 +1,6 @@
 ---
 title: "Template"
-author: "Studentnames and studentnumbers here"
+author: "Jakob, Ben, and David"
 date: "`r Sys.Date()`"
 output: pdf_document
 bibliography: references.bib
@@ -11,10 +11,9 @@ csl: apa.csl
 # Set-up your environment
 
 ```{r package_install, include=FALSE}
-install.packages("tidyverse")
-install.packages("yaml")
-install.packages("rmarkdown")
-
+# install.packages("tidyverse")
+# install.packages("yaml")
+# install.packages("rmarkdown")
 ```
 
 ```{r packages}
@@ -24,6 +23,95 @@ require(yaml)
 library(tidyr)
 library(writexl)
 library(readxl)
+```
+```{r}
+gdp_data           <- read_csv("data/raw_gdp.csv")
+unemployment_sex   <- read_csv("data/raw_unemployment_sex.csv")
+unemployment_youth <- read_csv("data/raw_unemployment_youth.csv")
+```
+```{r}
+# Filter all three datasets down to just the Netherlands
+gdp_clean   <- gdp_data %>% filter(geo == "Netherlands")
+unemp_clean <- unemployment_sex %>% filter(geo == "Netherlands")
+youth_clean <- unemployment_youth %>% filter(geo == "Netherlands")
+```
+```{r}
+# Plot both general and youth lines together using your perfect 11-row sheets
+ggplot() +
+  geom_line(data = unemp_clean, aes(x = TIME_PERIOD, y = OBS_VALUE, color = "Total Unemployment"), size = 1) +
+  geom_line(data = youth_clean, aes(x = TIME_PERIOD, y = OBS_VALUE, color = "Youth Unemployment"), size = 1) +
+  theme_minimal() +
+  scale_color_manual(values = c("Total Unemployment" = "darkred", "Youth Unemployment" = "orange")) +
+  labs(
+    title = "Unemployment Comparison in the Netherlands (2015-2025)",
+    x = "Year",
+    y = "Unemployment Rate (%)",
+    color = "Demographic Group"
+  )
+```
+```{r}
+# 1. Combine the datasets safely
+combined_data <- left_join(gdp_clean, unemp_clean, by = "TIME_PERIOD")
+
+# 2. Draw the Okun's Law chart with explicit chronological labels
+ggplot(data = combined_data, aes(x = OBS_VALUE.x, y = OBS_VALUE.y)) +
+  geom_point(size = 4, color = "darkblue") +
+  
+  # MAGIC LAYER: This punches the timeline back onto the canvas
+  geom_text(aes(label = TIME_PERIOD), vjust = -1.2, size = 3.5, fontface = "bold", color = "black") +
+  
+  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "Okun's Law: GDP Growth vs. Unemployment Timeline",
+    subtitle = "Text labels reveal chronological policy distortions and labor market lags",
+    x = "Annual GDP Growth Rate (%)",
+    y = "Total Unemployment Rate (%)"
+  )
+```
+```{r}
+# Event Analysis: Total Unemployment with a 2020 Shock Policy Line
+ggplot(data = unemp_clean, aes(x = TIME_PERIOD, y = OBS_VALUE)) +
+  geom_line(color = "darkred", size = 1) +
+  geom_point(color = "darkred", size = 2.5) +
+  # This adds the vertical dashed line required by the rubric
+  geom_vline(xintercept = 2020, linetype = "dashed", color = "black", size = 1) +
+  # This places the text label directly next to the line
+  annotate("text", x = 2020.2, y = 7, label = "COVID-19 Shock (2020)", hjust = 0, fontface = "bold") +
+  theme_minimal() +
+  labs(
+    title = "Event Analysis: Impact of the 2020 Shock on Dutch Labor",
+    x = "Year",
+    y = "Unemployment Rate (%)"
+  )
+```
+```{r,message=FALSE, warning=FALSE}
+library(maps)
+
+# 1. Pull European map coordinates from R's built-in database
+europe_map <- map_data("world") %>%
+  filter(region %in% c("Netherlands", "Germany", "Belgium", "France", "Italy", "Spain", "Austria", "Denmark"))
+
+# 2. Extract 2020 data directly without unnecessary sub-filters
+europe_unemp_2020 <- unemployment_sex %>%
+  filter(TIME_PERIOD == 2020) %>%
+  rename(region = geo) 
+
+# 3. Merge the coordinates and the economic data together
+map_data_joined <- left_join(europe_map, europe_unemp_2020, by = "region")
+
+# 4. Draw the spatial map with the color gradient filled in
+ggplot(map_data_joined, aes(x = long, y = lat, group = group, fill = OBS_VALUE)) +
+  geom_polygon(color = "white", size = 0.2) +
+  scale_fill_viridis_c(option = "plasma", na.value = "gray80", name = "Unemployment (%)") +
+  coord_fixed(1.3) +
+  theme_minimal() +
+  labs(
+    title = "Spatial Variation: Unemployment Rates Across Western Europe (2020)",
+    subtitle = "Visualizing regional labor market vulnerability during the pandemic shock",
+    x = "Longitude",
+    y = "Latitude"
+  )
 ```
 
 # Title Page
