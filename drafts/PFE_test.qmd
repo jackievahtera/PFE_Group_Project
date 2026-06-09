@@ -1,0 +1,161 @@
+---
+title: "PFE_test"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+
+library(readr)
+
+df1 <- read_csv("/Users/ben/Documents/GWU/ProgramForEcon/raw_gdp.csv")
+df2 <- read_csv("/Users/ben/Documents/GWU/ProgramForEcon/raw_unemployment_sex.csv")
+df3 <- read_csv("/Users/ben/Documents/GWU/ProgramForEcon/raw_unemployment_youth.csv")
+
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed)
+
+```{r}
+library(ggplot2)
+
+library(dplyr)
+
+df1_avg <- df1 %>%
+  group_by(TIME_PERIOD) %>%
+  summarise(OBS_VALUE = mean(OBS_VALUE, na.rm = TRUE))
+
+ggplot(df1_avg, aes(x = TIME_PERIOD, y = OBS_VALUE)) +
+  geom_line() +
+  labs(title = "World Average GDP Over Time", x = "Year", y = "GDP")
+
+```
+
+```{r}
+ggplot(df1, aes(x = TIME_PERIOD, y = OBS_VALUE, group = geo, color = geo)) +
+  geom_line() +
+  labs(title = "GDP Over Time by Country", x = "Year", y = "GDP")
+```
+
+```{r}
+ggplot(df1, aes(x = TIME_PERIOD, y = OBS_VALUE)) +
+  geom_line() +
+  facet_wrap(~ geo) +
+  labs(title = "GDP Over Time by Country", x = "Year", y = "GDP")
+```
+
+```{r}
+ggplot(df1, aes(x = OBS_VALUE)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Distribution of GDP", x = "GDP", y = "Count")
+```
+
+```{r}
+unique(df1$geo)
+```
+
+```{r}
+west_big <- df1 %>%
+  filter(geo %in% c(
+    "United States",
+    "Germany",
+    "France",
+    "United Kingdom",
+    "Netherlands",
+    "Belgium",
+    "Austria",
+    "Switzerland",
+    "Denmark",
+    "Norway",
+    "Sweden",
+    "Finland"
+  ))
+west_small <- df1 %>%
+  filter(geo %in% c(
+    "Germany",
+    "France",
+    "United Kingdom",
+    "Netherlands",
+    "Belgium"
+  ))
+eu_core <- df1 %>%
+  filter(geo %in% c(
+    "Germany",
+    "France",
+    "Italy",
+    "Spain",
+    "Netherlands",
+    "Belgium"
+  ))
+```
+
+```{r}
+ggplot(eu_core,
+       aes(x = TIME_PERIOD,
+           y = geo,
+           fill = OBS_VALUE)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "C")
+
+avg_growth <- eu_core %>%
+  group_by(geo) %>%
+  summarize(avg_growth = mean(OBS_VALUE))
+
+ggplot(avg_growth,
+       aes(x = reorder(geo, avg_growth),
+           y = avg_growth)) +
+  geom_col() +
+  coord_flip()
+
+summary <- eu_core %>%
+  group_by(geo) %>%
+  summarize(
+    avg_growth = mean(OBS_VALUE),
+    volatility = sd(OBS_VALUE)
+  )
+
+ggplot(summary,
+       aes(volatility,
+           avg_growth,
+           label = geo)) +
+  geom_point(size = 3) +
+  geom_text(nudge_y = 0.1)
+
+ggplot(eu_core,a
+       aes(TIME_PERIOD,
+           OBS_VALUE,
+           group = geo)) +
+  geom_line(color = "grey80") +
+  geom_line(
+    data = subset(eu_core, geo == "Germany"),
+    linewidth = 1.5
+  )
+
+```
+
+```{r}
+ggplot(west_small,
+       aes(x = OBS_VALUE,
+           fill = geo)) +
+  geom_density(alpha = 0.4)
+
+ggplot(west_small,
+       aes(x = geo,
+           y = OBS_VALUE)) +
+  geom_boxplot()
+```
