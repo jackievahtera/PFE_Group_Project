@@ -136,7 +136,7 @@ ggplot(summary,
   geom_point(size = 3) +
   geom_text(nudge_y = 0.1)
 
-ggplot(eu_core,a
+ggplot(eu_core,
        aes(TIME_PERIOD,
            OBS_VALUE,
            group = geo)) +
