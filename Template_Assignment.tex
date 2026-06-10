@@ -1,0 +1,364 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Template},
+  pdfauthor={Jakob, Ben, and David},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Template}
+\author{Jakob, Ben, and David}
+\date{2026-06-09}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(maps)}
+
+\CommentTok{\# Load data}
+\NormalTok{gdp\_data           }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"data/raw\_gdp.csv"}\NormalTok{)}
+\NormalTok{unemployment\_sex   }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"data/raw\_unemployment\_sex.csv"}\NormalTok{)}
+\NormalTok{unemployment\_youth }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"data/raw\_unemployment\_youth.csv"}\NormalTok{)}
+
+\CommentTok{\# Clean data}
+\NormalTok{gdp\_clean }\OtherTok{\textless{}{-}}\NormalTok{ gdp\_data }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(geo }\SpecialCharTok{==} \StringTok{"Netherlands"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(TIME\_PERIOD, OBS\_VALUE) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{Year =}\NormalTok{ TIME\_PERIOD, }\AttributeTok{GDP\_Growth =}\NormalTok{ OBS\_VALUE) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(GDP\_Growth))}
+
+\NormalTok{unemp\_clean }\OtherTok{\textless{}{-}}\NormalTok{ unemployment\_sex }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(geo }\SpecialCharTok{==} \StringTok{"Netherlands"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(TIME\_PERIOD, OBS\_VALUE) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{Year =}\NormalTok{ TIME\_PERIOD, }\AttributeTok{Unemp\_Rate =}\NormalTok{ OBS\_VALUE) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Unemp\_Rate =} \FunctionTok{ifelse}\NormalTok{(Unemp\_Rate }\SpecialCharTok{==} \SpecialCharTok{{-}}\DecValTok{99}\NormalTok{, }\ConstantTok{NA}\NormalTok{, Unemp\_Rate)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(Unemp\_Rate))}
+
+\NormalTok{youth\_clean }\OtherTok{\textless{}{-}}\NormalTok{ unemployment\_youth }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(geo }\SpecialCharTok{==} \StringTok{"Netherlands"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(TIME\_PERIOD, OBS\_VALUE) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{Year =}\NormalTok{ TIME\_PERIOD, }\AttributeTok{Youth\_Unemp\_Rate =}\NormalTok{ OBS\_VALUE) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Youth\_Unemp\_Rate =} \FunctionTok{ifelse}\NormalTok{(Youth\_Unemp\_Rate }\SpecialCharTok{==} \SpecialCharTok{{-}}\DecValTok{99}\NormalTok{, }\ConstantTok{NA}\NormalTok{, Youth\_Unemp\_Rate)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(Youth\_Unemp\_Rate))}
+
+\CommentTok{\# Merge and engineer variables}
+\NormalTok{combined\_data }\OtherTok{\textless{}{-}}\NormalTok{ gdp\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(unemp\_clean, }\AttributeTok{by =} \StringTok{"Year"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(youth\_clean, }\AttributeTok{by =} \StringTok{"Year"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Youth\_Vulnerability\_Ratio =}\NormalTok{ Youth\_Unemp\_Rate }\SpecialCharTok{/}\NormalTok{ Unemp\_Rate)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Set-up your environment}\label{set-up-your-environment}
+
+\section{Title Page}\label{title-page}
+
+A new sentence Include your names
+
+Include the tutorial group number
+
+Include your tutorial lecturer's name
+
+\section{Part 1 - Identify a Social
+Problem}\label{part-1---identify-a-social-problem}
+
+Use APA referencing throughout your document.
+\href{https://www.mendeley.com/guides/apa-citation-guide/}{Here's a link
+to some explanation.}
+
+\subsection{1.1 Describe the Social
+Problem}\label{describe-the-social-problem}
+
+Include the following:
+
+\begin{itemize}
+\item
+  Why is this relevant? (Smith, 2020)
+\item
+  \ldots{}
+\end{itemize}
+
+\section{Part 2 - Data Sourcing}\label{part-2---data-sourcing}
+
+\subsection{2.1 Load in the data}\label{load-in-the-data}
+
+Preferably from a URL, but if not, make sure to download the data and
+store it in a shared location that you can load the data in from. Do not
+store the data in a folder you include in the Github repository!
+
+midwest is an example dataset included in the tidyverse package
+
+\subsection{2.2 Provide a short summary of the
+dataset(s)}\label{provide-a-short-summary-of-the-datasets}
+
+In this case we see 28 variables, but we miss some information on what
+units they are in. We also don't know anything about the year/moment in
+which this data has been captured.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{inline\_code }\OtherTok{=} \ConstantTok{TRUE}
+\end{Highlighting}
+\end{Shaded}
+
+These are things that are usually included in the metadata of the
+dataset. For your project, you need to provide us with the information
+from your metadata that we need to understand your dataset of choice.
+
+\subsection{2.3 Describe the type of variables
+included}\label{describe-the-type-of-variables-included}
+
+Think of things like:
+
+\begin{itemize}
+\item
+  Do the variables contain health information or SES information?
+\item
+  Have they been measured by interviewing individuals or is the data
+  coming from administrative sources?
+\end{itemize}
+
+\emph{For the sake of this example, I will continue with the
+assignment\ldots{}}
+
+\section{Part 3 - Quantifying}\label{part-3---quantifying}
+
+\subsection{3.1 Data cleaning}\label{data-cleaning}
+
+Our primary empirical data cleaning steps---including filtering
+exclusively for the Netherlands territorial boundaries and isolating the
+continuous percentage level transformations---were successfully executed
+within our master centralized data pipeline at the top of the file to
+preserve top-to-bottom reproducibility.
+
+Please use a separate `R block' of code for each type of cleaning. So,
+e.g.~one for missing values, a new one for removing unnecessary
+variables etc.
+
+\subsection{3.2 Generate necessary
+variables}\label{generate-necessary-variables}
+
+Variable 1: Youth Vulnerability Ratio
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# This variable was engineered during our master data pipeline at the top:}
+\CommentTok{\# combined\_data \textless{}{-} combined\_data \%\textgreater{}\% mutate(Youth\_Vulnerability\_Ratio = Youth\_Unemp\_Rate / Unemp\_Rate)}
+\CommentTok{\# It standardizes the youth unemployment rate as a proportion of aggregate total unemployment.}
+\end{Highlighting}
+\end{Shaded}
+
+Variable 2
+
+\section{Relational database joins and chronological baseline
+alignments}\label{relational-database-joins-and-chronological-baseline-alignments}
+
+\section{were successfully completed using left\_join() functions in the
+master
+pipeline.}\label{were-successfully-completed-using-left_join-functions-in-the-master-pipeline.}
+
+\subsection{3.3 Visualize temporal
+variation}\label{visualize-temporal-variation}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Template_Assignment_files/Template_Assignment_files/figure-latex/temporal_plot-1.pdf}}
+
+\subsection{3.4 Visualize spatial
+variation}\label{visualize-spatial-variation}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Template_Assignment_files/Template_Assignment_files/figure-latex/spatial_map-1.pdf}}
+
+Here you provide a description of why the plot above is relevant to your
+specific social problem.
+
+\subsection{3.5 Visualize sub-population
+variation}\label{visualize-sub-population-variation}
+
+What is the poverty rate by state?
+
+\pandocbounded{\includegraphics[keepaspectratio]{Template_Assignment_files/Template_Assignment_files/figure-latex/demographic_comparison-1.pdf}}
+
+Here you provide a description of why the plot above is relevant to your
+specific social problem.
+
+\subsection{3.6 Event Analysis}\label{event-analysis}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ combined\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ GDP\_Growth, }\AttributeTok{y =}\NormalTok{ Unemp\_Rate)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{4}\NormalTok{, }\AttributeTok{color =} \StringTok{"darkblue"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =}\NormalTok{ Year), }\AttributeTok{vjust =} \SpecialCharTok{{-}}\FloatTok{1.2}\NormalTok{, }\AttributeTok{size =} \FloatTok{3.5}\NormalTok{, }\AttributeTok{fontface =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Event Analysis: Okun\textquotesingle{}s Law and 2020 Policy Distortions"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Isolating the 2020 emergency wage{-}subsidy cushion effect"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Annual GDP Growth Rate (\%)"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Total Unemployment Rate (\%)"}\NormalTok{,}
+    \AttributeTok{caption =} \StringTok{"Source: Eurostat Unified Matrix"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{expand =} \FunctionTok{expansion}\NormalTok{(}\AttributeTok{mult =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.05}\NormalTok{, }\FloatTok{0.12}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Template_Assignment_files/Template_Assignment_files/figure-latex/unnamed-chunk-1-1.pdf}}
+
+\section{Part 4 - Discussion}\label{part-4---discussion}
+
+\subsection{4.1 Discuss your findings}\label{discuss-your-findings}
+
+\section{Part 5 - Reproducibility}\label{part-5---reproducibility}
+
+\subsection{5.1 Github repository link}\label{github-repository-link}
+
+Provide the link to your PUBLIC repository here: \ldots{}
+
+\subsection{5.2 Reference list}\label{reference-list}
+
+Use APA referencing throughout your document.
+
+\protect\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-smith2020}
+Smith, J. (2020). My article. \emph{Journal of Things}, \emph{1}, 1--10.
+
+\end{CSLReferences}
+
+\end{document}
