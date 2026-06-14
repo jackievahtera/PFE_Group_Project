@@ -46,10 +46,6 @@ combined_data <- gdp_clean %>%
 
 # Set-up your environment
 
-
-
-
-
 # Title Page
 A new sentence
 Include your names
@@ -128,7 +124,7 @@ Variable 2
 
 ## 3.3 Visualize temporal variation
 
-```{r temporal_plot, echo=FALSE}
+```{r message=FALSE, warning=FALSE}
 ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   geom_line(color = "darkred", linewidth = 1) +
   geom_point(color = "darkred", size = 2.5) +
@@ -136,13 +132,14 @@ ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   annotate("text", x = 2020.2, y = 7, label = "COVID-19 Shock (2020)", hjust = 0, fontface = "bold") +
   scale_x_continuous(breaks = seq(2015, 2025, by = 2)) +
   theme_minimal() +
-  labs(title = "Temporal Variation: Dutch Unemployment Rate (2015-2025)", x = "Year", y = "Unemployment Rate (%)")
+  labs(title = "Unemployment Rate in the Netherlands (2015-2025)", x = "Year", y = "Unemployment Rate (%)") +
+  ylim(2, 8.5)
 ```
 
 
 ## 3.4 Visualize spatial variation
 
-```{r spatial_map, echo=FALSE, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 europe_map <- map_data("world") %>%
   filter(region %in% c("Netherlands", "Germany", "Belgium", "France", "Italy", "Spain", "Austria", "Denmark"))
 
@@ -154,10 +151,10 @@ map_data_joined <- left_join(europe_map, europe_unemp_2020, by = "region")
 
 ggplot(map_data_joined, aes(x = long, y = lat, group = group, fill = OBS_VALUE)) +
   geom_polygon(color = "white", linewidth = 0.2) +
-  scale_fill_viridis_c(option = "plasma", na.value = "gray80", name = "Unemployment (%)") +
+scale_fill_gradient(low = "royalblue", high = "firebrick", na.value = "gray80", name = "Unemployment (%)") +
   coord_fixed(1.3) +
   theme_minimal() +
-  labs(title = "Spatial Variation: Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
+  labs(title = "Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
 ```
 
 
@@ -167,7 +164,7 @@ Here you provide a description of why the plot above is relevant to your specifi
 
 What is the poverty rate by state?
 
-```{r demographic_comparison, echo=FALSE}
+```{r message=FALSE, warning=FALSE}
 ggplot(data = combined_data) +
   geom_line(aes(x = Year, y = Unemp_Rate, color = "Total Unemployment"), linewidth = 1) +
   geom_line(aes(x = Year, y = Youth_Unemp_Rate, color = "Youth Unemployment"), linewidth = 1) +
@@ -176,21 +173,26 @@ ggplot(data = combined_data) +
   theme_minimal() +
   scale_color_manual(values = c("Total Unemployment" = "darkred", "Youth Unemployment" = "orange")) +
   scale_x_continuous(breaks = seq(2015, 2025, by = 2)) +
-  labs(title = "Sub-Population Variation: Youth vs. Total Unemployment", x = "Year", y = "Unemployment Rate (%)", color = "Demographic Group")
+  labs(title = "Youth vs. Total Unemployment in the Netherlands", x = "Year", y = "Unemployment Rate (%)", color = "Demographic Group")
 ```
 
 Here you provide a description of why the plot above is relevant to your specific social problem.
 
 ## 3.6 Event Analysis
-```{r}
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
 ggplot(data = combined_data, aes(x = GDP_Growth, y = Unemp_Rate)) +
-  geom_point(size = 4, color = "darkblue") +
-  geom_text(aes(label = Year), vjust = -1.2, size = 3.5, fontface = "bold", color = "black") +
-  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = FALSE) +
+  geom_smooth(data = filter(combined_data, Year != 2020), 
+              method = "lm", color = "gray40", linetype = "dashed", se = FALSE, fullrange = TRUE) +
+  geom_point(data = filter(combined_data, Year != 2020), 
+             size = 4, color = "royalblue") +
+  geom_point(data = filter(combined_data, Year == 2020), 
+             size = 5, color = "firebrick") +
+  geom_text(aes(label = Year), vjust = -1.3, size = 3.5, fontface = "bold", color = "black") +
   theme_minimal() +
   labs(
     title = "Event Analysis: Okun's Law and 2020 Policy Distortions",
-    subtitle = "Isolating the 2020 emergency wage-subsidy cushion effect",
+    subtitle = "Red point highlights the emergency wage-subsidy decoupling effect",
     x = "Annual GDP Growth Rate (%)",
     y = "Total Unemployment Rate (%)",
     caption = "Source: Eurostat Unified Matrix"
