@@ -124,16 +124,34 @@ Variable 2
 
 ## 3.3 Visualize temporal variation
 
-```{r message=FALSE, warning=FALSE}
+```{r temporal_plot, message=FALSE, warning=FALSE}
+temporal_changes <- combined_data %>%
+  arrange(Year) %>%
+  mutate(
+    Ppt_Change = Unemp_Rate - lag(Unemp_Rate),
+    x_mid = (Year + lag(Year)) / 2,
+    y_mid = (Unemp_Rate + lag(Unemp_Rate)) / 2,
+    Label_Text = ifelse(Ppt_Change > 0, 
+                        paste0("+", round(Ppt_Change, 1), "%"), 
+                        paste0(round(Ppt_Change, 1), "%"))
+  ) %>%
+  filter(!is.na(Ppt_Change))
+
 ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   geom_line(color = "darkred", linewidth = 1) +
   geom_point(color = "darkred", size = 2.5) +
   geom_vline(xintercept = 2020, linetype = "dashed", color = "black", linewidth = 0.8) +
   annotate("text", x = 2020.2, y = 7, label = "COVID-19 Shock (2020)", hjust = 0, fontface = "bold") +
+  
+  geom_label(data = temporal_changes, 
+             aes(x = x_mid, y = y_mid, label = Label_Text),
+             fill = "white", color = "gray20", size = 2.8, fontface = "bold",
+             label.padding = unit(0.15, "lines"), label.size = 0.1) +
+             
   scale_x_continuous(breaks = seq(2015, 2025, by = 2)) +
   theme_minimal() +
-  labs(title = "Unemployment Rate in the Netherlands (2015-2025)", x = "Year", y = "Unemployment Rate (%)") +
-  ylim(2, 8.5)
+  labs(title = "Dutch Unemployment Rate (2015-2025)", x = "Year", y = "Unemployment Rate (%)") +
+  ylim(0.5, 8.5)
 ```
 
 
@@ -149,12 +167,35 @@ europe_unemp_2020 <- unemployment_sex %>%
 
 map_data_joined <- left_join(europe_map, europe_unemp_2020, by = "region")
 
+country_labels <- map_data_joined %>%
+  group_by(region) %>%
+  summarise(
+    long = mean(range(long)),
+    lat = mean(range(lat)),
+    Unemp_Rate = first(OBS_VALUE)
+  ) %>%
+  mutate(
+    lat = case_when(
+      region == "Netherlands" ~ lat + 0.5,
+      region == "Belgium" ~ lat - 0.4,
+      TRUE ~ lat
+    ),
+    long = case_when(
+      region == "Germany" ~ long - 0.3,
+      TRUE ~ long
+    )
+  )
+
 ggplot(map_data_joined, aes(x = long, y = lat, group = group, fill = OBS_VALUE)) +
-  geom_polygon(color = "white", linewidth = 0.2) +
-scale_fill_gradient(low = "royalblue", high = "firebrick", na.value = "gray80", name = "Unemployment (%)") +
+  geom_polygon(color = "white", linewidth = 0.3) +
+  scale_fill_gradient(low = "royalblue", high = "firebrick", na.value = "gray80", name = "Unemployment (%)") +
+  geom_text(data = country_labels, 
+            aes(x = long, y = lat, label = paste0(region, "\n", Unemp_Rate, "%")), 
+            inherit.aes = FALSE, 
+            size = 3.2, fontface = "bold", color = "black") +
   coord_fixed(1.3) +
   theme_minimal() +
-  labs(title = "Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
+  labs(title = "Spatial Variation: Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
 ```
 
 
