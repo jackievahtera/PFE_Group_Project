@@ -1,4 +1,4 @@
-# Programming for Economists — Group 25
+# Programming for Economists — Group 2_5
 
 Quantifying a Social Problem: GDP Growth and Unemployment in the Netherlands and Western Europe.
 
