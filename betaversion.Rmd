@@ -1,5 +1,5 @@
 ---
-title: "Template"
+title: "GDP Growth and Unemployment in the Netherlands and Western Europe (2015–2025)"
 author: "Jakob, Ben, and David"
 date: "`r Sys.Date()`"
 output: pdf_document
@@ -46,47 +46,39 @@ combined_data <- gdp_clean %>%
 
 # Set-up your environment
 
-# Title Page
-A new sentence
-Include your names
+# GDP Growth and Unemployment in the Netherlands and Western Europe
 
-Include the tutorial group number
+**Authors:** Jakob Vahtera Persson, Ben Akyureklier, David Craveiro
 
-Include your tutorial lecturer's name
+**Tutorial group:** 2_5
+
+**Tutorial lecturer:** F. Amankour (Fatima)
 
 # Part 1 - Identify a Social Problem
 
-Use APA referencing throughout your document. [Here's a link to some explanation.](https://www.mendeley.com/guides/apa-citation-guide/)
-
 ## 1.1 Describe the Social Problem
 
-Include the following:
+Unemployment is one of the most closely watched indicators of economic well-being, because joblessness carries costs that go beyond lost income: it is associated with poorer mental and physical health, lower lifetime earnings, and weaker social cohesion [@eurofound2017]. A central question for policymakers is how unemployment responds to the wider economy. Okun's Law describes a stable negative relationship between output growth and unemployment [@okun1962]: when GDP grows, unemployment tends to fall, and vice versa.
 
--   Why is this relevant? [@smith2020]
-
--   ...
+Understanding the strength of this link matters for policy. If unemployment reacts sharply to downturns, governments may need stronger automatic stabilisers; if it reacts weakly — as during the 2020 COVID-19 shock, when wage-subsidy schemes kept workers employed — the usual relationship can break down. This report quantifies the relationship between GDP growth and unemployment in the Netherlands (2015-2025), compares unemployment across Western Europe, and examines how youth workers are disproportionately exposed.
 
 # Part 2 - Data Sourcing
 
 ## 2.1 Load in the data
 
-Preferably from a URL, but if not, make sure to download the data and store it in a shared location that you can load the data in from. Do not store the data in a folder you include in the Github repository!
+We use three datasets downloaded from Eurostat, the statistical office of the European Union. The exact tables are:
 
+- Real GDP growth rate: Eurostat table `tec00115` (annual % change).
+- Total unemployment rate: Eurostat table `tesem120`.
+- Youth unemployment rate (ages 15-24): Eurostat table `tipslm80`.
 
-
-midwest is an example dataset included in the tidyverse package
+The raw extracts are stored in the `data/` folder and loaded in the pipeline at the top of this document.
 
 ## 2.2 Provide a short summary of the dataset(s)
 
 
 
-In this case we see 28 variables, but we miss some information on what units they are in. We also don't know anything about the year/moment in which this data has been captured.
-
-``` r
-inline_code = TRUE
-```
-
-These are things that are usually included in the metadata of the dataset. For your project, you need to provide us with the information from your metadata that we need to understand your dataset of choice.
+Each dataset reports an annual percentage value per country. The unemployment series express the number of unemployed as a share of the active labour force; the GDP series expresses the annual percentage change in real GDP. All values are sourced from Eurostat and cover the period 2015-2025.
 
 ## 2.3 Describe the type of variables included
 
@@ -96,31 +88,25 @@ Think of things like:
 
 -   Have they been measured by interviewing individuals or is the data coming from administrative sources?
 
-*For the sake of this example, I will continue with the assignment...*
+The variables are socio-economic indicators. Unemployment figures come from the EU Labour Force Survey, a large harmonised household survey, while GDP figures come from national accounts compiled by national statistical institutes. The data is therefore official administrative/survey data, comparable across countries, rather than self-reported by individuals.
 
 # Part 3 - Quantifying
 
 ## 3.1 Data cleaning
 
-Our primary empirical data cleaning steps—including filtering exclusively for the Netherlands territorial boundaries and isolating the continuous percentage level transformations—were successfully executed within our master centralized data pipeline at the top of the file to preserve top-to-bottom reproducibility.
-
-Please use a separate 'R block' of code for each type of cleaning. So, e.g. one for missing values, a new one for removing unnecessary variables etc.
+All cleaning steps were run in the data pipeline at the top of this file to keep the workflow reproducible. For each dataset we (1) filtered for the Netherlands, (2) kept only the year and value columns, (3) recoded the placeholder -99 as NA and dropped missing values, and (4) joined the three series by year.
 
 ## 3.2 Generate necessary variables
 
 Variable 1: Youth Vulnerability Ratio
 
-```{r gen_var1}
-# This variable was engineered during our master data pipeline at the top:
-# combined_data <- combined_data %>% mutate(Youth_Vulnerability_Ratio = Youth_Unemp_Rate / Unemp_Rate)
-# It standardizes the youth unemployment rate as a proportion of aggregate total unemployment.
+This variable divides the youth unemployment rate by the total unemployment 
+rate (`Youth_Unemp_Rate / Unemp_Rate`), created in the pipeline at the top. 
+It shows how much more exposed young workers are than the workforce as a whole.
 
-```
+Variable 2: Annual change in unemployment (percentage points)
 
-Variable 2
-
-# Relational database joins and chronological baseline alignments 
-# were successfully completed using left_join() functions in the master pipeline.
+We construct the year-on-year change in the unemployment rate (`Ppt_Change`) to capture labour-market dynamics rather than levels. It is created in the event-analysis chunk in 3.6 using `Unemp_Rate - lag(Unemp_Rate)`, and is used to quantify how sharply unemployment moved around the 2020 shock.
 
 ## 3.3 Visualize temporal variation
 
@@ -194,11 +180,10 @@ ggplot(map_data_joined, aes(x = long, y = lat, group = group, fill = OBS_VALUE))
 ```
 
 
-Here you provide a description of why the plot above is relevant to your specific social problem.
+The map shows wide spatial variation in 2020 unemployment across Western Europe. The Netherlands (4.9%) and Germany (3.6%) sit at the low end, while Spain reaches 15.5% and Italy 9.3%. This clear north-south gradient places the Dutch labour market in context as relatively resilient, and motivates focusing the time-series analysis on the Netherlands.
 
 ## 3.5 Visualize sub-population variation
 
-What is the poverty rate by state?
 
 ```{r youth_unemployment, message=FALSE, warning=FALSE}
 df_total <- unemp_clean %>%
@@ -227,7 +212,7 @@ ggplot(data = youth_data, aes(x = Year, y = Unemployment_Rate, color = Demograph
   )
 ```
 
-Here you provide a description of why the plot above is relevant to your specific social problem.
+Youth unemployment (ages 15-24) stays consistently far above the total rate across the whole period, peaking near 12.5% in 2015 and spiking again around the 2020 shock before easing. This persistent gap shows that young workers absorb a disproportionate share of labour-market shocks, which is the rationale behind our Youth Vulnerability Ratio.
 
 ## 3.6 Event Analysis
 
@@ -260,17 +245,32 @@ ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   labs(title = "Dutch Unemployment Rate (2015-2025)", x = "Year", y = "Unemployment Rate (%)") +
   ylim(1.5, 9)
 ```
-  
+
+The labelled changes show unemployment fell steadily before 2020 (around -1 ppt per year), then rose by only +0.5 ppt in the COVID-19 year. This increase is remarkably small given the sharp GDP contraction that year, most likely because the Dutch emergency wage-subsidy scheme (NOW) kept workers formally employed, temporarily weakening the usual Okun's Law relationship.
+
 # Part 4 - Discussion
 
 ## 4.1 Discuss your findings
+
+Our analysis points to four findings. First, Dutch unemployment fell steadily from roughly 8% in 2015 to below 4% by 2025, interrupted only by a small rise around the 2020 COVID-19 shock. Second, GDP growth and unemployment broadly move in opposite directions, consistent with Okun's Law, but 2020 is a clear outlier: GDP fell sharply while unemployment barely moved, most likely because of the Dutch wage-subsidy scheme. Third, youth unemployment is consistently two to three times the total rate and moves more sharply with the cycle, as captured by our Youth Vulnerability Ratio. Fourth, the 2020 spatial comparison shows the Netherlands among the most resilient labour markets in Western Europe.
+
+These results should be read with caution. We document associations, not causal effects: GDP and unemployment are both shaped by other factors that affect them at the same time, such as labour-market policy, demographic change, and measurement differences across Eurostat series. The 2020 point shows clearly how a simple correlation can mislead. Limitations include the short annual series (2015-2025), the focus on the Netherlands for the time-series analysis, and the use of a single year (2020) for the spatial map.
 
 # Part 5 - Reproducibility
 
 ## 5.1 Github repository link
 
-Provide the link to your PUBLIC repository here: ...
+https://github.com/jackievahtera/PFE_Group_Project
 
-## 5.2 Reference list
+## 5.2 How to reproduce this report
 
-Use APA referencing throughout your document.
+The repository contains this report (`betaversion.Rmd`), a `data/` folder with the three Eurostat CSV extracts (`raw_gdp.csv`, `raw_unemployment_sex.csv`, `raw_unemployment_youth.csv`), the bibliography (`references.bib`), and a `README.md` with a project overview.
+
+To reproduce the report: (1) clone the repository, (2) open `ProgrForEconom.Rproj` in RStudio, (3) make sure the three CSVs are in the `data/` folder, (4) install the required packages (`tidyverse`, `maps`), and (5) knit `betaversion.Rmd` to PDF. Knitting re-reads the raw data and regenerates every figure and statistic in the document. All file paths in the `.Rmd` are relative to the project root, so the project runs on any machine without changes.
+
+## 5.3 Reference list
+
+Eurostat. (2025). Real GDP growth rate; Total unemployment rate; Youth 
+unemployment rate [Data sets, tables tec00115, tesem120, tipslm80]. 
+https://ec.europa.eu/eurostat
+

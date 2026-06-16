@@ -186,7 +186,6 @@ Here you provide a description of why the plot above is relevant to your specifi
 ggplot(data = combined_data, aes(x = GDP_Growth, y = Unemp_Rate)) +
   geom_point(size = 4, color = "darkblue") +
   geom_text(aes(label = Year), vjust = -1.2, size = 3.5, fontface = "bold", color = "black") +
-  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = FALSE) +
   theme_minimal() +
   labs(
     title = "Event Analysis: Okun's Law and 2020 Policy Distortions",
