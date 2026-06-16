@@ -82,12 +82,6 @@ Each dataset reports an annual percentage value per country. The unemployment se
 
 ## 2.3 Describe the type of variables included
 
-Think of things like:
-
--   Do the variables contain health information or SES information?
-
--   Have they been measured by interviewing individuals or is the data coming from administrative sources?
-
 The variables are socio-economic indicators. Unemployment figures come from the EU Labour Force Survey, a large harmonised household survey, while GDP figures come from national accounts compiled by national statistical institutes. The data is therefore official administrative/survey data, comparable across countries, rather than self-reported by individuals.
 
 # Part 3 - Quantifying
