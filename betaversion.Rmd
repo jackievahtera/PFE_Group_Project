@@ -125,6 +125,113 @@ Variable 2
 ## 3.3 Visualize temporal variation
 
 ```{r temporal_plot, message=FALSE, warning=FALSE}
+ggplot(data = combined_data, aes(x = Year)) +
+  geom_line(aes(y = Unemp_Rate, color = "Unemployment Rate"), linewidth = 1) +
+  geom_point(aes(y = Unemp_Rate, color = "Unemployment Rate"), size = 2.5) +
+  
+  geom_line(aes(y = GDP_Growth, color = "GDP Growth Rate"), linewidth = 1) +
+  geom_point(aes(y = GDP_Growth, color = "GDP Growth Rate"), size = 2.5) +
+  
+  scale_color_manual(values = c("Unemployment Rate" = "darkred", "GDP Growth Rate" = "royalblue")) +
+  scale_x_continuous(breaks = seq(2015, 2025, by = 2)) +
+  scale_y_continuous(breaks = seq(-4, 10, by = 2)) +
+  theme_minimal() +
+  labs(
+    title = "GDP Growth vs. Unemployment Rate in Netherlands (2015-2025)",
+    x = "Year",
+    y = "Rate (%)",
+    color = "Economic Indicator"
+  )
+```
+
+
+## 3.4 Visualize spatial variation
+
+```{r message=FALSE, warning=FALSE}
+europe_map <- map_data("world") %>%
+  filter(region %in% c("Netherlands", "Germany", "Belgium", "France", "Italy", "Spain", "Austria", "Denmark"))
+
+europe_unemp_2020 <- unemployment_sex %>%
+  filter(TIME_PERIOD == 2020) %>%
+  rename(region = geo) 
+
+map_data_joined <- left_join(europe_map, europe_unemp_2020, by = "region")
+
+country_labels <- map_data_joined %>%
+  group_by(region) %>%
+  summarise(
+    long = mean(range(long)),
+    lat = mean(range(lat)),
+    Unemp_Rate = first(OBS_VALUE)
+  ) %>%
+  mutate(
+    lat = case_when(
+      region == "Netherlands" ~ lat + 1.0,
+      region == "Belgium" ~ lat - 0.6,
+      TRUE ~ lat
+    ),
+    long = case_when(
+      region == "Netherlands" ~ long - 0.5,
+      region == "Belgium" ~ long - 0.9,
+      region == "Germany" ~ long + 0.6,
+      TRUE ~ long
+    )
+  )
+
+ggplot(map_data_joined, aes(x = long, y = lat, group = group, fill = OBS_VALUE)) +
+  geom_polygon(color = "white", linewidth = 0.3) +
+  scale_fill_gradient(low = "royalblue", high = "firebrick", na.value = "gray80", name = "Unemployment (%)") +
+  
+  geom_label(data = country_labels, 
+             aes(x = long, y = lat, label = paste0(region, "\n", Unemp_Rate, "%")), 
+             inherit.aes = FALSE, 
+             fill = "white", color = "black", size = 3.0, fontface = "bold",
+             label.padding = unit(0.2, "lines"), label.size = 0.15) +
+             
+  coord_fixed(1.3) +
+  theme_minimal() +
+  labs(title = "Spatial Variation: Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
+```
+
+
+Here you provide a description of why the plot above is relevant to your specific social problem.
+
+## 3.5 Visualize sub-population variation
+
+What is the poverty rate by state?
+
+```{r youth_unemployment, message=FALSE, warning=FALSE}
+df_total <- unemp_clean %>%
+  rename(Unemployment_Rate = 2) %>%
+  mutate(Demographic_Group = "Total Unemployment")
+
+df_youth <- youth_clean %>%
+  filter(Year >= 2015 & Year <= 2025) %>%
+  rename(Unemployment_Rate = 2) %>%
+  mutate(Demographic_Group = "Youth Unemployment")
+
+youth_data <- bind_rows(df_total, df_youth)
+
+ggplot(data = youth_data, aes(x = Year, y = Unemployment_Rate, color = Demographic_Group, group = Demographic_Group)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = c("Total Unemployment" = "darkred", "Youth Unemployment" = "orange")) +
+  scale_x_continuous(breaks = seq(2015, 2025, by = 2)) +
+  scale_y_continuous(limits = c(2, 14), breaks = seq(2, 14, by = 2)) +
+  theme_minimal() +
+  labs(
+    title = "Youth vs. Total Unemployment in the Netherlands",
+    x = "Year",
+    y = "Unemployment Rate (%)",
+    color = "Demographic Group"
+  )
+```
+
+Here you provide a description of why the plot above is relevant to your specific social problem.
+
+## 3.6 Event Analysis
+
+```{r pandemic_timeline, message=FALSE, warning=FALSE}
 temporal_changes <- combined_data %>%
   arrange(Year) %>%
   mutate(
@@ -151,94 +258,7 @@ ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   scale_x_continuous(breaks = seq(2015, 2025, by = 2)) +
   theme_minimal() +
   labs(title = "Dutch Unemployment Rate (2015-2025)", x = "Year", y = "Unemployment Rate (%)") +
-  ylim(0.5, 8.5)
-```
-
-
-## 3.4 Visualize spatial variation
-
-```{r message=FALSE, warning=FALSE}
-europe_map <- map_data("world") %>%
-  filter(region %in% c("Netherlands", "Germany", "Belgium", "France", "Italy", "Spain", "Austria", "Denmark"))
-
-europe_unemp_2020 <- unemployment_sex %>%
-  filter(TIME_PERIOD == 2020) %>%
-  rename(region = geo) 
-
-map_data_joined <- left_join(europe_map, europe_unemp_2020, by = "region")
-
-country_labels <- map_data_joined %>%
-  group_by(region) %>%
-  summarise(
-    long = mean(range(long)),
-    lat = mean(range(lat)),
-    Unemp_Rate = first(OBS_VALUE)
-  ) %>%
-  mutate(
-    lat = case_when(
-      region == "Netherlands" ~ lat + 0.5,
-      region == "Belgium" ~ lat - 0.4,
-      TRUE ~ lat
-    ),
-    long = case_when(
-      region == "Germany" ~ long - 0.3,
-      TRUE ~ long
-    )
-  )
-
-ggplot(map_data_joined, aes(x = long, y = lat, group = group, fill = OBS_VALUE)) +
-  geom_polygon(color = "white", linewidth = 0.3) +
-  scale_fill_gradient(low = "royalblue", high = "firebrick", na.value = "gray80", name = "Unemployment (%)") +
-  geom_text(data = country_labels, 
-            aes(x = long, y = lat, label = paste0(region, "\n", Unemp_Rate, "%")), 
-            inherit.aes = FALSE, 
-            size = 3.2, fontface = "bold", color = "black") +
-  coord_fixed(1.3) +
-  theme_minimal() +
-  labs(title = "Spatial Variation: Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
-```
-
-
-Here you provide a description of why the plot above is relevant to your specific social problem.
-
-## 3.5 Visualize sub-population variation
-
-What is the poverty rate by state?
-
-```{r message=FALSE, warning=FALSE}
-ggplot(data = combined_data) +
-  geom_line(aes(x = Year, y = Unemp_Rate, color = "Total Unemployment"), linewidth = 1) +
-  geom_line(aes(x = Year, y = Youth_Unemp_Rate, color = "Youth Unemployment"), linewidth = 1) +
-  geom_point(aes(x = Year, y = Unemp_Rate, color = "Total Unemployment"), size = 2) +
-  geom_point(aes(x = Year, y = Youth_Unemp_Rate, color = "Youth Unemployment"), size = 2) +
-  theme_minimal() +
-  scale_color_manual(values = c("Total Unemployment" = "darkred", "Youth Unemployment" = "orange")) +
-  scale_x_continuous(breaks = seq(2015, 2025, by = 2)) +
-  labs(title = "Youth vs. Total Unemployment in the Netherlands", x = "Year", y = "Unemployment Rate (%)", color = "Demographic Group")
-```
-
-Here you provide a description of why the plot above is relevant to your specific social problem.
-
-## 3.6 Event Analysis
-```{r message=FALSE, warning=FALSE}
-library(tidyverse)
-ggplot(data = combined_data, aes(x = GDP_Growth, y = Unemp_Rate)) +
-  geom_smooth(data = filter(combined_data, Year != 2020), 
-              method = "lm", color = "gray40", linetype = "dashed", se = FALSE, fullrange = TRUE) +
-  geom_point(data = filter(combined_data, Year != 2020), 
-             size = 4, color = "royalblue") +
-  geom_point(data = filter(combined_data, Year == 2020), 
-             size = 5, color = "firebrick") +
-  geom_text(aes(label = Year), vjust = -1.3, size = 3.5, fontface = "bold", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Event Analysis: Okun's Law and 2020 Policy Distortions",
-    subtitle = "Red point highlights the emergency wage-subsidy decoupling effect",
-    x = "Annual GDP Growth Rate (%)",
-    y = "Total Unemployment Rate (%)",
-    caption = "Source: Eurostat Unified Matrix"
-  ) +
-  scale_y_continuous(expand = expansion(mult = c(0.05, 0.12)))
+  ylim(1.5, 9)
 ```
   
 # Part 4 - Discussion
