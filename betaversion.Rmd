@@ -131,14 +131,16 @@ ggplot(data = combined_data, aes(x = Year)) +
 
 
 ## 3.4 Visualize spatial variation
-
+# Background: all European countries, drawn in neutral grey
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Build the data the map needs
 europe_map <- map_data("world") %>%
-  filter(region %in% c("Netherlands", "Germany", "Belgium", "France", "Italy", "Spain", "Austria", "Denmark"))
+  filter(region %in% c("Netherlands", "Germany", "Belgium", "France",
+                       "Italy", "Spain", "Austria", "Denmark"))
 
 europe_unemp_2020 <- unemployment_sex %>%
   filter(TIME_PERIOD == 2020) %>%
-  rename(region = geo) 
+  rename(region = geo)
 
 map_data_joined <- left_join(europe_map, europe_unemp_2020, by = "region")
 
@@ -163,17 +165,33 @@ country_labels <- map_data_joined %>%
     )
   )
 
-ggplot(map_data_joined, aes(x = long, y = lat, group = group, fill = OBS_VALUE)) +
-  geom_polygon(color = "white", linewidth = 0.3) +
-  scale_fill_gradient(low = "royalblue", high = "firebrick", na.value = "gray80", name = "Unemployment (%)") +
-  
-  geom_label(data = country_labels, 
-             aes(x = long, y = lat, label = paste0(region, "\n", Unemp_Rate, "%")), 
-             inherit.aes = FALSE, 
+# Neutral background of surrounding countries
+europe_bg <- map_data("world") %>%
+  filter(region %in% c("Netherlands", "Germany", "Belgium", "France", "Italy",
+                       "Spain", "Austria", "Denmark", "Portugal", "Switzerland",
+                       "UK", "Ireland", "Luxembourg", "Czech Republic", "Poland",
+                       "Slovenia", "Croatia", "Slovakia", "Hungary", "Norway",
+                       "Sweden"))
+
+# The map
+ggplot() +
+  geom_polygon(data = europe_bg, aes(x = long, y = lat, group = group),
+               fill = "gray80", color = "white", linewidth = 0.3) +
+  geom_polygon(data = map_data_joined,
+               aes(x = long, y = lat, group = group, fill = OBS_VALUE),
+               color = "white", linewidth = 0.3) +
+  geom_point(data = data.frame(long = NA, lat = NA, grp = "Not available"),
+             aes(x = long, y = lat, shape = grp), fill = "gray80",
+             color = "gray40", size = 4) +
+  scale_fill_gradient(low = "royalblue", high = "firebrick",
+                      na.value = "gray80", name = "Unemployment (%)") +
+  scale_shape_manual(name = NULL, values = c("Not available" = 22)) +
+  geom_label(data = country_labels,
+             aes(x = long, y = lat, label = paste0(region, "\n", Unemp_Rate, "%")),
+             inherit.aes = FALSE,
              fill = "white", color = "black", size = 3.0, fontface = "bold",
              label.padding = unit(0.2, "lines"), label.size = 0.15) +
-             
-  coord_fixed(1.3) +
+  coord_fixed(1.3, xlim = c(-10, 20), ylim = c(35, 58)) +
   theme_minimal() +
   labs(title = "Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
 ```
@@ -198,10 +216,24 @@ df_youth <- youth_clean %>%
 
 youth_data <- bind_rows(df_total, df_youth)
 
+# Compute IQR bounds per group for labelling
+iqr_labels <- youth_data %>%
+  group_by(Demographic_Group) %>%
+  summarise(
+    q1 = quantile(Unemployment_Rate, 0.25),
+    q3 = quantile(Unemployment_Rate, 0.75),
+    iqr = q3 - q1
+  ) %>%
+  mutate(label = paste0("IQR: ", round(iqr, 1), " ppt"))
 ggplot(data = youth_data, aes(x = Demographic_Group, y = Unemployment_Rate, fill = Demographic_Group)) +
   geom_boxplot(alpha = 0.7, width = 0.5, outlier.shape = NA) +
   geom_jitter(width = 0.12, size = 1.8, alpha = 0.6) +
+  geom_text(data = iqr_labels,
+            aes(x = Demographic_Group, y = q3, label = label),
+            inherit.aes = FALSE,
+            hjust = -0.25, vjust = -0.5, size = 3.2, fontface = "italic") +
   scale_fill_manual(values = c("Total Unemployment" = "darkred", "Youth Unemployment" = "orange")) +
+  ylim(2.5, 13) +
   theme_minimal() +
   theme(legend.position = "none") +
   labs(
@@ -210,8 +242,7 @@ ggplot(data = youth_data, aes(x = Demographic_Group, y = Unemployment_Rate, fill
     y = "Unemployment Rate (%)"
   )
 ```
-
-Youth unemployment (ages 15-24) stays consistently far above the total rate across the whole period, peaking near 12.5% in 2015 and spiking again around the 2020 shock before easing. This persistent gap shows that young workers absorb a disproportionate share of labour-market shocks, which is the rationale behind our Youth Vulnerability Ratio.
+Youth unemployment (ages 15–24) sits consistently far above the total rate across the whole period. The two distributions barely overlap. The youth box has a median of roughly 8.9% against about 4.4% for the total rate, so even the best youth years are worse than typical years for the workforce as a whole. The gap is not only in level but in spread: youth unemployment has a wider interquartile range (1.9 ppt vs 1.6 ppt) and longer whiskers, meaning it is more volatile year-to-year and reacts more sharply to downturns like the 2020 shock. This pattern of a higher floor and greater dispersion is what motivates our Youth Vulnerability Ratio. Young workers absorb a disproportionate and more variable share of labour-market shocks, and a single summary number understates how differently the two groups experience the same economy.
 
 ## 3.6 Event Analysis
 
@@ -273,16 +304,6 @@ Eurostat. (2025). Real GDP growth rate; Total unemployment rate; Youth
 unemployment rate [Data sets, tables tec00115, tesem120, tipslm80]. 
 https://ec.europa.eu/eurostat
 
-ggplot(data = youth_data, aes(x = Demographic_Group, y = Unemployment_Rate, fill = Demographic_Group)) +
-  geom_boxplot(alpha = 0.7, width = 0.5, outlier.shape = NA) +
-  geom_jitter(width = 0.12, size = 1.8, alpha = 0.6) +
-  scale_fill_manual(values = c("Total Unemployment" = "darkred", "Youth Unemployment" = "orange")) +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(
-    title = "Distribution of Youth vs. Total Unemployment (2015–2025)",
-    x = NULL,
-    y = "Unemployment Rate (%)"
-  )
+
        
        
