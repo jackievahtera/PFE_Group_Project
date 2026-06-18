@@ -79,6 +79,9 @@ We use three datasets downloaded from Eurostat, the statistical office of the Eu
 
 The raw extracts are stored in the `data/` folder and loaded in the pipeline at the top of this document.
 
+We rely on Eurostat rather than CBS or the OECD because the spatial comparison in Section 3.4 only works if every country's unemployment rate is built the same way. CBS would in principle give a more precise series for the Netherlands, since it is the original data collector and Eurostat's Dutch figures are themselves derived from CBS submissions, but it has no equivalent for Spain or Italy, so a CBS-based analysis could not have supported the cross-country part of this report at all. The OECD was considered too, but its unemployment definitions are not always applied identically across member states, which would have undermined the same comparability the spatial map depends on.
+Going through Eurostat rather than CBS directly means our Dutch figures pass through an extra harmonisation step we cannot inspect, and any rounding or adjustment Eurostat applies before publishing is invisible to us. We also take Eurostat's definition of the labour force as given, rather than checking it against how CBS itself frames unemployment domestically. The Dutch trend we report matches widely cited figures for the period, so we don't think this changes our conclusions, but the spatial and time-series parts of the analysis both depend on the same Eurostat methodology, which is also why the definition-mismatch limitation in Section 4.1 cannot be fixed simply by picking a different source.
+
 ## 2.2 Provide a short summary of the dataset(s)
 
 Each dataset reports an annual percentage value per country. The unemployment series express the number of unemployed as a share of the active labour force; the GDP series expresses the annual percentage change in real GDP. All values are sourced from Eurostat and cover the period 2015-2025.
@@ -128,7 +131,7 @@ ggplot(data = combined_data, aes(x = Year)) +
     color = "Economic Indicator"
   )
 ```
-
+The two series show a clear inverse trend over most of the period: unemployment declines steadily from 2015 while GDP growth fluctuates around a positive average, consistent with Okun's Law. The exception is 2020, when GDP collapses sharply but unemployment continues falling rather than spiking, breaking the otherwise visible inverse pattern.
 
 ## 3.4 Visualize spatial variation
 # Background: all European countries, drawn in neutral grey
@@ -276,7 +279,7 @@ ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   ylim(1.5, 9)
 ```
 
-The labelled changes show unemployment fell steadily before 2020 (around -1 ppt per year), then rose by only +0.5 ppt in the COVID-19 year. This increase is remarkably small given the sharp GDP contraction that year, most likely because the Dutch emergency wage-subsidy scheme (NOW) kept workers formally employed, temporarily weakening the usual Okun's Law relationship.
+The labelled changes show unemployment fell steadily before 2020 (around -1 ppt per year), then rose by only +0.5 ppt in the COVID-19 year. After this single-year interruption, the pre-2020 downward trend resumes, with unemployment falling again through 2022 before levelling off around 3.5-4% by 2025. This increase is remarkably small given the sharp GDP contraction that year, most likely because the Dutch emergency wage-subsidy scheme (NOW) kept workers formally employed, temporarily weakening the usual Okun's Law relationship.
 
 # Part 4 - Discussion
 
