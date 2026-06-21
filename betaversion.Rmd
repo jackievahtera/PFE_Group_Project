@@ -1,7 +1,8 @@
 ---
 title: "GDP Growth and Unemployment in the Netherlands and Western Europe (2015–2025)"
-author: "Jakob, Ben, and David"
+author: "Jakob Vahtera Persson, Ben Akyureklier, David Craveiro"
 date: "`r Sys.Date()`"
+subtitle: "Tutorial group 2_5 | Tutorial lecturer: F. Amankour (Fatima)"
 output:
   pdf_document: 
    latex_engine: xelatex
@@ -47,25 +48,15 @@ combined_data <- gdp_clean %>%
   mutate(Youth_Vulnerability_Ratio = Youth_Unemp_Rate / Unemp_Rate)
 ```
 
-# Set-up your environment
-
-# GDP Growth and Unemployment in the Netherlands and Western Europe
-
-**Authors:** Jakob Vahtera Persson, Ben Akyureklier, David Craveiro
-
-**Tutorial group:** 2_5
-
-**Tutorial lecturer:** F. Amankour (Fatima)
-
 # Part 1 - Identify a Social Problem
 
 ## 1.1 Describe the Social Problem
 
-Unemployment is one of the most closely watched indicators of economic well-being, because joblessness carries costs that go beyond lost income: it is associated with poorer mental and physical health, lower lifetime earnings, and weaker social cohesion [@eurofound2017]. A central question for policymakers is how unemployment responds to the wider economy. Okun's Law describes a stable negative relationship between output growth and unemployment [@okun1962]: when GDP grows, unemployment tends to fall, and vice versa.
+Unemployment is one of the most closely watched indicators of economic well-being, because joblessness carries costs that go beyond lost income: it is associated with poorer mental and physical health, lower lifetime earnings, and weaker social cohesion [@eurofound2017]. This is particularly true for youths, who are more likely to experience long-term scarring effects from early unemployment, including reduced future earnings and slower career progression [@eurofound2017]. A central question for policymakers is how unemployment responds to the wider economy. Okun's Law describes a stable negative relationship between output growth and unemployment [@okun1962]: when GDP grows, unemployment tends to fall, and vice versa.
 
-Understanding the strength of this link matters for policy. If unemployment reacts sharply to downturns, governments may need stronger automatic stabilisers; if it reacts weakly — as during the 2020 COVID-19 shock, when wage-subsidy schemes kept workers employed — the usual relationship can break down. This report quantifies the relationship between GDP growth and unemployment in the Netherlands (2015-2025), compares unemployment across Western Europe, and examines how youth workers are disproportionately exposed.
+However, there may be circumstances in which the market does not respond as expected. It is therefore important to examine when and why these situations arise, so that governments and policymakers can design appropriate policies to address them. The 2020 COVID-19 shock is one such case: large-scale wage-subsidy schemes kept workers formally employed despite a sharp economic contraction, weakening the usual relationship between output and unemployment. This report quantifies the relationship between GDP growth and unemployment in the Netherlands (2015-2025), compares unemployment across Western Europe, and examines how youth workers are disproportionately exposed.
 
-Existing work establishes Okun's Law as a broad empirical regularity, but two gaps remain underexplored. First, the coefficient is not stable across countries: estimates for the Netherlands differ markedly from euro-area averages, yet country-specific deviations are often glossed over in cross-country studies (Ball et al., 2017). Second, the COVID-19 period may represent a structural break rather than a normal cyclical episode, since large-scale job-retention schemes severed the usual output–unemployment link in ways the pre-2020 literature could not anticipate. This report addresses both by focusing on a single country and treating 2020 as a potential break rather than a data point on a stable line.
+Existing work establishes Okun's Law as a broad empirical regularity, but two gaps remain underexplored. First, the strength of this relationship is not stable across countries: estimates for the Netherlands differ markedly from euro-area averages, yet country-specific deviations are often glossed over in cross-country studies (Ball et al., 2017). Second, the COVID-19 period may represent a structural break rather than a normal cyclical episode, since large-scale job-retention schemes severed the usual output–unemployment link in ways the pre-2020 literature could not anticipate. This report aims to address this gap by looking at the Dutch labour market specifically, treating 2020 as a potential structural break rather than a data point on a stable trend line.
 
 # Part 2 - Data Sourcing
 
@@ -77,10 +68,9 @@ We use three datasets downloaded from Eurostat, the statistical office of the Eu
 - Total unemployment rate: Eurostat table `tesem120`.
 - Youth unemployment rate (ages 15-24): Eurostat table `tipslm80`.
 
-The raw extracts are stored in the `data/` folder and loaded in the pipeline at the top of this document.
+Eurostat data allows for systematic cross-country comparison, since every member state's unemployment rate is constructed using the same harmonised definitions and survey methodology. This comparability is essential for the spatial analysis in Section 3.4, where unemployment rates across eight Western European countries are compared directly. National statistical offices such as CBS (Statistics Netherlands) and international bodies such as the OECD (Organisation for European Economic Co-operation) were also considered. CBS would likely offer a more granular series for the Netherlands specifically, but does not provide directly comparable figures for the other countries in this report, and OECD unemployment definitions are not always applied identically across member states. Eurostat was therefore the only source that could support both the time-series analysis and the cross-country comparison within a single, consistent framework, though this means the report inherits Eurostat's specific methodological choices throughout rather than cross-checking them against an independent source.
 
-We rely on Eurostat rather than CBS or the OECD because the spatial comparison in Section 3.4 only works if every country's unemployment rate is built the same way. CBS would in principle give a more precise series for the Netherlands, since it is the original data collector and Eurostat's Dutch figures are themselves derived from CBS submissions, but it has no equivalent for Spain or Italy, so a CBS-based analysis could not have supported the cross-country part of this report at all. The OECD was considered too, but its unemployment definitions are not always applied identically across member states, which would have undermined the same comparability the spatial map depends on.
-Going through Eurostat rather than CBS directly means our Dutch figures pass through an extra harmonisation step we cannot inspect, and any rounding or adjustment Eurostat applies before publishing is invisible to us. We also take Eurostat's definition of the labour force as given, rather than checking it against how CBS itself frames unemployment domestically. The Dutch trend we report matches widely cited figures for the period, so we don't think this changes our conclusions, but the spatial and time-series parts of the analysis both depend on the same Eurostat methodology, which is also why the definition-mismatch limitation in Section 4.1 cannot be fixed simply by picking a different source.
+Eurostat measures unemployment through the EU Labour Force Survey (EU-LFS), a quarterly household survey conducted across member states. A person is classified as unemployed if they are without work, are currently available to start work, and have actively sought employment in the preceding four weeks; this follows the International Labour Organization (ILO) definition, which allows comparison across countries regardless of differences in national registration systems for benefit claimants. Youth unemployment is measured using the same definition, applied to the population aged 15-24, and is expressed as a share of the youth labour force (i.e., young people who are either employed or actively seeking work), not as a share of the total youth population.
 
 ## 2.2 Provide a short summary of the dataset(s)
 
@@ -94,23 +84,19 @@ The variables are socio-economic indicators. Unemployment figures come from the 
 
 ## 3.1 Data cleaning
 
-All cleaning steps were run in the data pipeline at the top of this file to keep the workflow reproducible. For each dataset we (1) filtered for the Netherlands, (2) kept only the year and value columns, (3) recoded the placeholder -99 as NA and dropped missing values, and (4) joined the three series by year.
+For each dataset, the data preparation involved four steps: (1) filtering for the Netherlands, (2) retaining only the year and value columns, (3) recoding the placeholder value -99 as missing (NA) and removing missing observations, and (4) joining the three series by year. Full implementation details are available in the accompanying repository.
 
 Two of these decisions are worth questioning. Dropping rows where the value is missing is the simplest option, but for such a short annual series it discards information; multiple imputation or carrying the series forward could preserve sample size, at the cost of inventing values we cannot verify. More importantly, recoding the placeholder −99 as NA throws away the reason a value was missing: Eurostat uses distinct flags for "not available", "confidential", and "low reliability", and collapsing them into a single NA loses that signal. A refinement would be to retain the original status flags and decide case-by-case, rather than treating all missingness as equivalent.
 
 ## 3.2 Generate necessary variables
 
-Variable 1: Youth Vulnerability Ratio
+For the analyses, we first generated a Youth Vulnerability Ratio, which provides insight into how much more exposed young workers are to unemployment relative to the workforce as a whole. It is calculated by dividing the youth unemployment rate by the total unemployment rate, and a higher ratio indicates a wider gap between youth and overall labour-market conditions in a given year.
 
-This variable divides the youth unemployment rate by the total unemployment 
-rate (`Youth_Unemp_Rate / Unemp_Rate`), created in the pipeline at the top. 
-It shows how much more exposed young workers are than the workforce as a whole.
-
-Variable 2: Annual change in unemployment (percentage points)
-
-We construct the year-on-year change in the unemployment rate (`Ppt_Change`) to capture labour-market dynamics rather than levels. It is created in the event-analysis chunk in 3.6 using `Unemp_Rate - lag(Unemp_Rate)`, and is used to quantify how sharply unemployment moved around the 2020 shock.
+Second, we generated the annual change in unemployment, measured in percentage points, which captures the pace and direction of labour-market change from one year to the next rather than the unemployment level itself. This variable is calculated as the difference between each year's unemployment rate and the previous year's rate, and is used in Section 3.6 to quantify how sharply unemployment moved around the 2020 shock.
 
 ## 3.3 Visualize temporal variation
+
+Figure 1 shows how GDP growth and the unemployment rate have moved together in the Netherlands between 2015 and 2025.
 
 ```{r temporal_plot, echo=FALSE, message=FALSE, warning=FALSE}
 ggplot(data = combined_data, aes(x = Year)) +
@@ -131,10 +117,14 @@ ggplot(data = combined_data, aes(x = Year)) +
     color = "Economic Indicator"
   )
 ```
+*Figure 1: GDP growth and unemployment rate in the Netherlands, 2015-2025.*
+
 The two series show a clear inverse trend over most of the period: unemployment declines steadily from 2015 while GDP growth fluctuates around a positive average, consistent with Okun's Law. The exception is 2020, when GDP collapses sharply but unemployment continues falling rather than spiking, breaking the otherwise visible inverse pattern.
 
 ## 3.4 Visualize spatial variation
-# Background: all European countries, drawn in neutral grey
+
+Figure 2 maps unemployment rates across eight Western European countries in 2020, the year of the COVID-19 shock, with countries outside this comparison shown in grey rather than left blank.
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Build the data the map needs
 europe_map <- map_data("world") %>%
@@ -200,11 +190,15 @@ ggplot() +
 ```
 
 
+*Figure 2: Unemployment rates in 2020 across European countries.*
+
 The map shows wide spatial variation in 2020 unemployment across Western Europe. The Netherlands (4.9%) and Germany (3.6%) sit at the low end, while Spain reaches 15.5% and Italy 9.3%. This clear north-south gradient places the Dutch labour market in context as relatively resilient, and motivates focusing the time-series analysis on the Netherlands.
 
 Two anomalies stand out against the broad north–south gradient. France (8.0%) sits well above its northern neighbours despite a comparable economy, and Spain's 15.5% is more than four times the German rate — a dispersion too large to be cyclical alone, pointing to structural labour-market differences. Our mapping choices also carry limits worth stating. We show only eight countries, chosen for Western-European comparability, which excludes high-unemployment Southern and Eastern states and so understates the EU-wide spread. We map a single year (2020), which is both the COVID shock year and our spatial snapshot; a different year would shift the gradient, so the map should be read as one cross-section, not a structural ranking. A choropleth filled by country rather than labelled points would also reduce the visual weight given to geographically large but low-population countries.
 
 ## 3.5 Visualize sub-population variation
+
+Figure 3 shows the distribution of youth and total unemployment rates in the Netherlands across the full 2015-2025 period, illustrating both the typical level and the year-to-year spread within each group.
 
 
 ```{r youth_unemployment, echo=FALSE, message=FALSE, warning=FALSE}
@@ -245,9 +239,15 @@ ggplot(data = youth_data, aes(x = Demographic_Group, y = Unemployment_Rate, fill
     y = "Unemployment Rate (%)"
   )
 ```
+*Figure 3: Distribution of youth and total unemployment rates in the Netherlands, 2015-2025.*
+
 Youth unemployment (ages 15–24) sits consistently far above the total rate across the whole period. The two distributions barely overlap. The youth box has a median of roughly 8.9% against about 4.4% for the total rate, so even the best youth years are worse than typical years for the workforce as a whole. The gap is not only in level but in spread: youth unemployment has a wider interquartile range (1.9 ppt vs 1.6 ppt) and longer whiskers, meaning it is more volatile year-to-year and reacts more sharply to downturns like the 2020 shock. This pattern of a higher floor and greater dispersion is what motivates our Youth Vulnerability Ratio. Young workers absorb a disproportionate and more variable share of labour-market shocks, and a single summary number understates how differently the two groups experience the same economy.
 
+This gap should be interpreted carefully. As defined by the EU Labour Force Survey, the youth unemployment rate is expressed as a share of the youth labour force, not the full youth population — but a large share of 15-24 year-olds are full-time students who are economically inactive rather than unemployed, and are therefore excluded from the denominator entirely. This narrower denominator can inflate the youth rate relative to the total rate: a small absolute number of job-seeking students who cannot find part-time work can produce a comparatively large percentage when the labour force base itself is small. The gap documented here is therefore likely to reflect genuine labour-market vulnerability, but some part of it may also be a measurement artefact of how the youth labour force is defined, rather than purely a sign that young workers are disproportionately affected by economic downturns.
+
 ## 3.6 Event Analysis
+
+Figure 4 traces the year-on-year change in Dutch unemployment between 2015 and 2025, highlighting how sharply the rate moved around the 2020 COVID-19 shock.
 
 ```{r pandemic_timeline, echo=FALSE, message=FALSE, warning=FALSE}
 temporal_changes <- combined_data %>%
@@ -279,7 +279,9 @@ ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   ylim(1.5, 9)
 ```
 
-The labelled changes show unemployment fell steadily before 2020 (around -1 ppt per year), then rose by only +0.5 ppt in the COVID-19 year. After this single-year interruption, the pre-2020 downward trend resumes, with unemployment falling again through 2022 before levelling off around 3.5-4% by 2025. This increase is remarkably small given the sharp GDP contraction that year, most likely because the Dutch emergency wage-subsidy scheme (NOW) kept workers formally employed, temporarily weakening the usual Okun's Law relationship.
+*Figure 4: Year-on-year change in the Dutch unemployment rate, 2015-2025.*
+
+The labelled changes show unemployment fell steadily before 2020 (around -1 ppt per year), then rose by only +0.5 ppt in the COVID-19 year. After this single-year interruption, the pre-2020 downward trend resumes, with unemployment falling again through 2022 before levelling off around 3.5-4% by 2025. This increase is remarkably small given the sharp GDP contraction that year, most likely because of the Dutch government's emergency wage-subsidy scheme, the Tijdelijke Noodmaatregel Overbrugging voor Werkgelegenheid (NOW), which compensated employers for a share of wage costs in exchange for retaining staff during the pandemic [@uwv2020]. By keeping workers formally employed rather than registered as unemployed, the scheme temporarily weakened the usual Okun's Law relationship between output and unemployment.
 
 # Part 4 - Discussion
 
