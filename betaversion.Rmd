@@ -111,7 +111,7 @@ ggplot(data = combined_data, aes(x = Year)) +
   scale_y_continuous(breaks = seq(-4, 10, by = 2)) +
   theme_minimal() +
   labs(
-    title = "GDP Growth vs. Unemployment Rate in Netherlands (2015-2025)",
+    title = "Dutch GDP Growth and Unemployment Rates (2015-2025)",
     x = "Year",
     y = "Rate (%)",
     color = "Economic Indicator"
@@ -186,11 +186,11 @@ ggplot() +
              label.padding = unit(0.2, "lines"), label.size = 0.15) +
   coord_fixed(1.3, xlim = c(-10, 20), ylim = c(35, 58)) +
   theme_minimal() +
-  labs(title = "Western Europe Unemployment (2020)", x = "Longitude", y = "Latitude")
+  labs(title = "Unemployment in Europe (2020)", x = "Longitude", y = "Latitude")
 ```
 
 
-*Figure 2: Unemployment rates in 2020 across European countries.*
+*Figure 2: Unemployment rates in 2020 across Western European countries.*
 
 The map shows wide spatial variation in 2020 unemployment across Western Europe. The Netherlands (4.9%) and Germany (3.6%) sit at the low end, while Spain reaches 15.5% and Italy 9.3%. This clear north-south gradient places the Dutch labour market in context as relatively resilient, and motivates focusing the time-series analysis on the Netherlands.
 
@@ -234,7 +234,7 @@ ggplot(data = youth_data, aes(x = Demographic_Group, y = Unemployment_Rate, fill
   theme_minimal() +
   theme(legend.position = "none") +
   labs(
-    title = "Distribution of Youth vs. Total Unemployment (2015–2025)",
+    title = "Dutch Youth vs. Total Unemployment (2015-2025)",
     x = NULL,
     y = "Unemployment Rate (%)"
   )
@@ -279,7 +279,7 @@ ggplot(data = combined_data, aes(x = Year, y = Unemp_Rate)) +
   ylim(1.5, 9)
 ```
 
-*Figure 4: Year-on-year change in the Dutch unemployment rate, 2015-2025.*
+*Figure 4: Year-on-year change in the Netherlands unemployment rate, 2015-2025.*
 
 The labelled changes show unemployment fell steadily before 2020 (around -1 ppt per year), then rose by only +0.5 ppt in the COVID-19 year. After this single-year interruption, the pre-2020 downward trend resumes, with unemployment falling again through 2022 before levelling off around 3.5-4% by 2025. This increase is remarkably small given the sharp GDP contraction that year, most likely because of the Dutch government's emergency wage-subsidy scheme, the Tijdelijke Noodmaatregel Overbrugging voor Werkgelegenheid (NOW), which compensated employers for a share of wage costs in exchange for retaining staff during the pandemic [@uwv2020]. By keeping workers formally employed rather than registered as unemployed, the scheme temporarily weakened the usual Okun's Law relationship between output and unemployment.
 
